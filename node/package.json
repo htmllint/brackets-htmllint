@@ -1,0 +1,8 @@
+{
+  "name": "brackets-htmllint",
+  "version": "0.0.1",
+  "description": "module to access htmllint through brackets",
+  "dependencies": {
+    "htmllint": "^0.0.11"
+  }
+}
