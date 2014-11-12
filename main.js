@@ -3,20 +3,31 @@ define(function (require, exports, module) {
     var logger = '[brackets-htmllint]',
         namespace = 'brackets-htmllint';
 
-    var CodeInspector = brackets.getModule("language/CodeInspection"),
+    var CodeInspection = brackets.getModule("language/CodeInspection"),
         ExtensionUtils = brackets.getModule("utils/ExtensionUtils"),
         NodeDomain = brackets.getModule("utils/NodeDomain");
 
     var htmllintDomain = new NodeDomain("htmllint", ExtensionUtils.getModulePath(module, "node/htmllintDomain"));
 
-    
-
-    function handleLinter() {
-        htmllintDomain.exec("lint", currentDoc.getText())
+    function handleLinter(html, fullPath, opts) {
+        htmllintDomain.exec("lint", html)
             .done(function (errors) {
+                var result = {};
+                result.errors = [];
+
                 errors.forEach(function (error) {
                     console.log("[brackets-htmllint] error: ", error);
+                    result.errors.push({
+                        pos: {
+                            line: error.line,
+                            ch: error.column
+                        },
+                        message: error.name + ": " + error.msg,
+                        type: CodeInspection.Type.ERROR
+                    });
                 })
+                return result;
+
             }).fail(function (err) {
                 console.error("[brackets-htmllint] failed", err);
             });
@@ -24,7 +35,7 @@ define(function (require, exports, module) {
 
     CodeInspection.register("html", {
         name: namespace,
-        scanFile: handleLinter,
+        //scanFile: handleLinter,
         scanFileAsync: handleLinter
     });
 });
