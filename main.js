@@ -1,24 +1,30 @@
 define(function (require, exports, module) {
     "use strict";
+    var logger = '[brackets-htmllint]',
+        namespace = 'brackets-htmllint';
 
-    var ExtensionUtils = brackets.getModule("utils/ExtensionUtils"),
-        NodeDomain     = brackets.getModule("utils/NodeDomain");
+    var CodeInspector = brackets.getModule("language/CodeInspection"),
+        ExtensionUtils = brackets.getModule("utils/ExtensionUtils"),
+        NodeDomain = brackets.getModule("utils/NodeDomain");
 
-    var simpleDomain = new NodeDomain("htmllint", ExtensionUtils.getModulePath(module, "node/htmllintDomain"));
+    var htmllintDomain = new NodeDomain("htmllint", ExtensionUtils.getModulePath(module, "node/htmllintDomain"));
 
-    // Helper function that runs the htmllint command
-    // logs the result to the console
-    function logLint() {
-        simpleDomain.exec("lint", "<html><head></head><body></body></html>")
+    
+
+    function handleLinter() {
+        htmllintDomain.exec("lint", currentDoc.getText())
             .done(function (errors) {
                 errors.forEach(function (error) {
-                    console.log("[brackets-htmllint] error: ", error);  
+                    console.log("[brackets-htmllint] error: ", error);
                 })
             }).fail(function (err) {
-                    console.error("[brackets-htmllint] failed", err);
+                console.error("[brackets-htmllint] failed", err);
             });
     }
 
-    // Log memory when extension is loaded
-    logLint();
+    CodeInspection.register("html", {
+        name: namespace,
+        scanFile: handleLinter,
+        scanFileAsync: handleLinter
+    });
 });

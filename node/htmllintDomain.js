@@ -2,7 +2,7 @@
     "use strict";
     
     var htmllint = require("htmllint");
-        
+    console.log("KJHLJKHGLJHGKJHGKJHGKJHGKJHGKJHGKJHGKJHGKJHG")
     /**
      * @private
      * Handler function for htmllint
