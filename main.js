@@ -26,6 +26,7 @@ define(function (require, exports, module) {
                     result.errors.push(returnedError);
                 });
                 defer.resolve(result);
+
             }).fail(function (err) {
                 console.error("Failed: ", err);
             });
