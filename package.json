@@ -1,0 +1,17 @@
+{
+  "name": "htmllint.htmllint-brackets",
+  "title": "Brackets htmllint",
+  "homepage": "https://github.com/htmllint/brackets-htmllint",
+  "author": "Andrew Messier (https://github.com/messman)",
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/htmllint/brackets-htmllint.git"
+  },
+  "license": "ISC",
+  "version": "0.0.5",
+  "engines": {
+    "brackets": ">=0.38"
+  },
+  "description": "Lints .html files with npm's htmllint.",
+  "keywords": ["lint", "html", "codeInspection"]
+}
