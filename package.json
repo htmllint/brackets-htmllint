@@ -8,10 +8,7 @@
     "url" : "https://github.com/htmllint/brackets-htmllint.git"
   },
   "license": "ISC",
-  "version": "0.0.5",
-  "engines": {
-    "brackets": ">=0.38"
-  },
+  "version": "0.1.6",
   "description": "Lints .html files with npm's htmllint.",
   "keywords": ["lint", "html", "codeInspection"]
 }
