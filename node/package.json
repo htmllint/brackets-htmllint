@@ -3,6 +3,6 @@
   "version": "0.1.6",
   "description": "module to access htmllint through brackets",
   "dependencies": {
-    "htmllint": "0.2.1"
+    "htmllint": "0.2.2"
   }
 }
