@@ -1,7 +1,7 @@
 brackets-htmllint
 =================
 
-An Adobe Brackets extension for [htmllint](github.com/htmllint/htmllint).
+An Adobe Brackets extension for [htmllint](https://github.com/htmllint/htmllint).
 
 Please note that this is an extension to bring the basic functionality of htmllint to Brackets, and the functionality is currently being used only for testing. Users are encouraged to add the other features of htmllint!
 
