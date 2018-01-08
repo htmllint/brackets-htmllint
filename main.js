@@ -9,6 +9,7 @@ define(function (require, exports, module) {
         ExtensionUtils = brackets.getModule("utils/ExtensionUtils"),
         NodeDomain = brackets.getModule("utils/NodeDomain"),
         FileSystem = brackets.getModule("filesystem/FileSystem"),
+        FileSystemError = brackets.getModule("filesystem/FileSystemError"),
         FileUtils = brackets.getModule("file/FileUtils"),
         ProjectManager = brackets.getModule("project/ProjectManager");
 
@@ -17,35 +18,9 @@ define(function (require, exports, module) {
     function handleLinter(html, fullPath) {
         var defer = new $.Deferred();
         loadConfigs(fullPath).done(function (options) {
-            console.log("options: ", options);
             htmllintDomain.exec("lint", html, options)
-                .done(function (errors) {
-                    // Success!
-                    var result = {
-                        errors: []
-                    };
-                    for (var i = 0; i < errors.length; i++) {
-                        var error = errors[i];
-                        var newCode = error.code + ": ";
-                        var returnedError = {
-                            pos: {
-                                line: error.line - 1, // I don't know why.
-                                col: error.column
-                            },
-                            message: newCode,
-                            type: CodeInspection.Type.ERROR
-                        };
-
-                        // get the message!
-                        htmllintDomain.exec("getMessage", error.code, error.data)
-                            .done(function (message) { // eslint-disable-line no-loop-func
-                                returnedError.message = newCode + message;
-                            });
-                        result.errors.push(returnedError);
-                        if (i === errors.length - 1) {
-                            defer.resolve(result);
-                        }
-                    }
+                .done(function (result) {
+                    defer.resolve(result);
                 }).fail(function (err) {
                     console.error("Failed: ", err);
                     defer.reject(err);
@@ -74,10 +49,9 @@ define(function (require, exports, module) {
 
         // get the full absolute path to this directory.
         rootPath = projectRootEntry.fullPath;
-        //console.log("rootPath", rootPath);
+
         // get the path relative to the root of the project.
         relPath = FileUtils.getRelativeFilename(rootPath, fullPath);
-        //console.log("relPath before", relPath);
 
         // for files outside the root, use default config
         if (!relPath) {
@@ -86,10 +60,8 @@ define(function (require, exports, module) {
 
         // get the parent directory of our relative path (to remove the *.html part)
         relPath = FileUtils.getDirectoryPath(relPath);
-        //console.log("relPath after", relPath);
 
         lookUpFiles(rootPath, relPath).done(function (configs) {
-            //console.log("returning: ", configs);
             result.resolve(configs);
         });
 
@@ -103,7 +75,6 @@ define(function (require, exports, module) {
         // any changes made here should also be changed below
         // (too lazy to combine in yet another function)
         getConfig(rootPath + relPath).done(function (configs) {
-            //console.log(configs);
             var keys = Object.keys(configs);
             keys.forEach(function (key) {
                 if (configs.hasOwnProperty(key) && !finalConfigs[key]) {
@@ -118,9 +89,8 @@ define(function (require, exports, module) {
         while (relPath.length > 0) {
             // take off the '/' end of the path to get the new parent directory
             relPath = FileUtils.getDirectoryPath(relPath.substr(0, relPath.length - 1));
-            //console.log("stripping to: ", relPath);
+
             getConfig(rootPath + relPath).done(function (configs) { // eslint-disable-line no-loop-func
-                //console.log(configs);
                 var keys = Object.keys(configs);
                 keys.forEach(function (key) {
                     if (configs.hasOwnProperty(key) && !finalConfigs[key]) {
@@ -146,27 +116,27 @@ define(function (require, exports, module) {
         var result = new $.Deferred(),
             filePath = directory + _configFileName,
             file;
-        //console.log("searching for: ", filePath);
 
         // get the file object for the filename.
         file = FileSystem.getFileForPath(filePath);
         file.read(function (err, content) {
-            if (!err) {
-                var config = {};
-                try {
-                    config = JSON.parse(content);
-                } catch (e) {
-                    console.log("brackets-htmllint: error parsing " + file.fullPath + ". Details: " + e);
-                    result.resolve({});
-                    return;
+            if (err) {
+                if (err !== FileSystemError.NOT_FOUND) {
+                    console.log("brackets-htmllint: error finding file " + filePath + ". Details: " + err);
                 }
-                console.log("Found .htmllintrc at " + directory + "!", config);
-                result.resolve(config);
-            } else {
-                // file does not exist.
-                console.log("brackets-htmllint: error finding file " + filePath + ". Details: " + err);
                 result.resolve({});
+                return;
             }
+
+            var config = {};
+            try {
+                config = JSON.parse(content);
+            } catch (e) {
+                console.log("brackets-htmllint: error parsing " + file.fullPath + ". Details: " + e);
+                result.resolve({});
+                return;
+            }
+            result.resolve(config);
         });
         return result.promise();
     }
