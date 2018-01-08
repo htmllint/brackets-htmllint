@@ -4,7 +4,7 @@
 var htmllint = require("htmllint");
 
 function lint(html, opts) {
-    return htmllint(html, {"tag-bans": ["div"]}, opts);
+    return htmllint(html, opts);
 }
 
 function getMessage(code, data) {

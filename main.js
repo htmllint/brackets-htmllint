@@ -18,7 +18,7 @@ define(function (require, exports, module) {
         var defer = new $.Deferred();
         loadConfigs(fullPath).done(function (options) {
             console.log("options: ", options);
-            htmllintDomain.exec("lint", html)
+            htmllintDomain.exec("lint", html, options)
                 .done(function (errors) {
                     // Success!
                     var result = {
