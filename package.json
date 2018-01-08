@@ -10,5 +10,11 @@
   "license": "ISC",
   "version": "0.1.7",
   "description": "Lints .html files with npm's htmllint.",
-  "keywords": ["lint", "html", "codeInspection"]
+  "keywords": ["lint", "html", "codeInspection"],
+  "engines": {
+    "brackets": "^1.11.0"
+  },
+  "dependencies": {
+    "htmllint": "0.7.0"
+  }
 }
